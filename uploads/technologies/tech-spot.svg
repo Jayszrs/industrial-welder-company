@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#191B1F"/>
+  <g stroke="#72767C" stroke-width="1" opacity="0.35">
+    <line x1="0" y1="120" x2="800" y2="120"/>
+    <line x1="0" y1="480" x2="800" y2="480"/>
+  </g>
+  
+        <g fill="none" stroke="#E8E9E7" stroke-width="3">
+          <rect x="330" y="220" width="140" height="30"/>
+          <rect x="330" y="360" width="140" height="30"/>
+          <line x1="360" y1="250" x2="360" y2="360"/>
+          <line x1="440" y1="250" x2="440" y2="360"/>
+        </g>
+        <rect x="370" y="290" width="60" height="30" fill="#F5C400"/>
+  <text x="60" y="540" font-family="Arial, sans-serif" font-size="20" letter-spacing="2" fill="#E8E9E7" font-weight="bold">SPOT WELDING</text>
+  <text x="60" y="70" font-family="Arial, sans-serif" font-size="12" letter-spacing="4" fill="#F5C400">INDUSTRIAL</text>
+</svg>
