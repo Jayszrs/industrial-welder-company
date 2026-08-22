@@ -6,6 +6,7 @@ $pdo = getPDO();
 $aboutHome = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'about'")->fetch();
 $stats     = $pdo->query("SELECT * FROM stats ORDER BY sort_order ASC")->fetchAll();
 $industries = $pdo->query("SELECT * FROM industries ORDER BY sort_order ASC")->fetchAll();
+$pageHeaderImage = page_header_image_url($aboutHome['image'] ?? null, 'homepage', 0);
 
 $pageTitle       = t('about_page_title');
 $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, '');
@@ -14,7 +15,7 @@ $activePage      = 'about';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow"><?= e(t('about_page_eyebrow')) ?></div>
         <h1 class="page-title"><?= e(t('about_page_title')) ?></h1>

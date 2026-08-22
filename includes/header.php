@@ -31,7 +31,7 @@ $companyNameFull  = get_setting('company_name_' . $CURRENT_LANG, t('site_name'))
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e(base_url('assets/css/style.css')) ?>">
+<link rel="stylesheet" href="<?= e(asset_url('assets/css/style.css')) ?>">
 </head>
 <body class="<?= e($bodyClass ?? '') ?>">
 
@@ -58,7 +58,7 @@ $companyNameFull  = get_setting('company_name_' . $CURRENT_LANG, t('site_name'))
                 <a href="<?= e(langSwitchUrl('en')) ?>" class="<?= $CURRENT_LANG === 'en' ? 'is-active' : '' ?>"><?= e(t('lang_en')) ?></a>
             </div>
 
-            <a href="<?= e(base_url('contact.php')) ?>" class="btn btn--primary header-cta">
+            <a href="<?= e(base_url('contact.php')) ?>" class="btn header-cta">
                 <?= e(t('nav_contact')) ?>
             </a>
         </nav>
@@ -77,7 +77,7 @@ $companyNameFull  = get_setting('company_name_' . $CURRENT_LANG, t('site_name'))
         <li><a href="<?= e(base_url('products.php')) ?>"><?= e(t('nav_products')) ?></a></li>
         <li><a href="<?= e(base_url('projects.php')) ?>"><?= e(t('nav_projects')) ?></a></li>
         <li><a href="<?= e(base_url('news.php')) ?>"><?= e(t('nav_news')) ?></a></li>
-        <li><a href="<?= e(base_url('contact.php')) ?>"><?= e(t('nav_contact')) ?></a></li>
+        <li><a href="<?= e(base_url('contact.php')) ?>" class="mobile-contact-link"><?= e(t('nav_contact')) ?> <span aria-hidden="true">&#8594;</span></a></li>
     </ul>
     <div class="mobile-nav-footer">
         <div class="lang-switch">

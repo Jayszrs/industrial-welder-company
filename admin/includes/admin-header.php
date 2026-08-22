@@ -14,8 +14,8 @@ $adminActive = $adminActive ?? '';
 <title><?= e($adminTitle) ?> — Admin | Yamato Welding Industries</title>
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e(base_url('assets/css/style.css')) ?>">
-<link rel="stylesheet" href="<?= e(base_url('assets/css/admin.css')) ?>">
+<link rel="stylesheet" href="<?= e(asset_url('assets/css/style.css')) ?>">
+<link rel="stylesheet" href="<?= e(asset_url('assets/css/admin.css')) ?>">
 </head>
 <body class="admin-body">
 <div class="admin-shell">

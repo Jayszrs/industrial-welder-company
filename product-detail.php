@@ -46,11 +46,12 @@ $features = array_filter(array_map('trim', explode("\n", tf($product, 'features'
 $pageTitle       = tf($product, 'name');
 $pageDescription = truncate(tf($product, 'short_description'), 150);
 $activePage      = 'products';
+$pageHeaderImage = page_header_image_url($product['image'] ?? null, 'products', 2);
 
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow"><?= e($category ? tf($category, 'name') : t('products_eyebrow')) ?></div>
         <h1 class="page-title"><?= e(tf($product, 'name')) ?></h1>

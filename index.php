@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/language.php';
 
 $pdo = getPDO();
+ensure_hero_slides_table($pdo);
 
 $hero      = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'hero'")->fetch();
 $aboutHome = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'about'")->fetch();
@@ -23,12 +24,49 @@ $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, get_setting(
 $activePage      = 'home';
 $bodyClass       = 'has-transparent-header';
 
+$heroSlideRows = $pdo->query("SELECT * FROM hero_slides WHERE status = 1 ORDER BY sort_order ASC, id ASC")->fetchAll();
+$heroSlides = [];
+foreach ($heroSlideRows as $i => $slideRow) {
+    $heroSlides[] = [
+        'src' => image_url($slideRow['image'], 'hero-slides'),
+        'label' => 'Hero slide ' . ($i + 1),
+    ];
+}
+
+// First-run examples. As soon as admin slides exist, the database becomes the only source.
+if (empty($heroSlides)) {
+    $heroSlides = [
+        ['src' => base_url('assets/images/hero-welding-v2.jpg'), 'label' => 'Manual precision welding'],
+        ['src' => base_url('assets/images/hero-robotic-v2.jpg'), 'label' => 'Robotic welding automation'],
+        ['src' => base_url('assets/images/hero-machining-v2.jpg'), 'label' => 'Precision industrial machining'],
+    ];
+
+    if (!empty($hero['image']) && $hero['image'] !== 'hero-bg.svg') {
+        array_unshift($heroSlides, [
+            'src' => image_url($hero['image'], 'homepage'),
+            'label' => tf($hero, 'title'),
+        ]);
+    }
+}
+
+$locationAddress = get_setting('address_' . $CURRENT_LANG, get_setting('address_en'));
+$mapsQuery       = rawurlencode(str_replace(["\r", "\n"], ' ', $locationAddress));
+$mapsUrl         = 'https://www.google.com/maps/search/?api=1&query=' . $mapsQuery;
+$mapsEmbedUrl    = 'https://www.google.com/maps?q=' . $mapsQuery . '&output=embed';
+
 include __DIR__ . '/includes/header.php';
 ?>
 
 <!-- ============================== HERO ============================== -->
-<section class="hero">
-    <div class="hero-media" style="background-image:url('<?= e(image_url($hero['image'], 'homepage')) ?>');"></div>
+<section class="hero" data-hero-slider data-interval="5000" aria-label="Company introduction">
+    <div class="hero-slides" aria-hidden="true">
+        <?php foreach ($heroSlides as $i => $slide): ?>
+        <div class="hero-media hero-slide<?= $i === 0 ? ' is-active' : '' ?>"
+             <?= $i === 0
+                 ? 'style="background-image:url(\'' . e($slide['src']) . '\');"'
+                 : 'data-hero-bg="' . e($slide['src']) . '"' ?>></div>
+        <?php endforeach; ?>
+    </div>
     <div class="hero-overlay"></div>
     <div class="hero-inner">
         <div class="hero-eyebrow"><?= e(t('hero_eyebrow')) ?></div>
@@ -94,7 +132,7 @@ include __DIR__ . '/includes/header.php';
     </div>
     <div class="grid-3">
         <?php foreach ($services as $i => $svc): ?>
-        <div class="service-card reveal">
+        <a href="<?= e(base_url('technology.php#services')) ?>" class="service-card reveal" aria-label="<?= e(tf($svc, 'title')) ?>">
             <div class="service-num"><?= str_pad($i + 1, 2, '0', STR_PAD_LEFT) ?></div>
             <div class="service-media">
                 <img src="<?= e(image_url($svc['image'], 'services')) ?>" alt="<?= e(tf($svc, 'title')) ?>" loading="lazy">
@@ -103,13 +141,13 @@ include __DIR__ . '/includes/header.php';
             <div class="service-title-en"><?= e($svc['title_en']) ?></div>
             <p class="service-desc"><?= e(truncate(tf($svc, 'description'), 70)) ?></p>
             <div class="service-arrow">&#8594;</div>
-        </div>
+        </a>
         <?php endforeach; ?>
     </div>
 </section>
 
 <!-- ============================== WELDING TECHNOLOGY ============================== -->
-<section class="section section--dark">
+<section class="section section--dark<?= !empty($strength['image']) ? ' section--content-bg' : '' ?>"<?= !empty($strength['image']) ? ' style="background-image:url(\'' . e(image_url($strength['image'], 'homepage')) . '\');"' : '' ?>>
     <div class="container">
         <div class="section-head reveal">
             <div class="eyebrow"><?= e(t('tech_eyebrow')) ?></div>
@@ -117,16 +155,27 @@ include __DIR__ . '/includes/header.php';
             <p class="section-subtitle"><?= e(t('tech_subtitle')) ?></p>
         </div>
 
-        <div class="tech-list">
+        <div class="tech-list" data-tech-accordion>
             <?php foreach ($technologies as $i => $tech): ?>
-            <div class="tech-row reveal">
-                <div class="tech-index"><?= str_pad($i + 1, 2, '0', STR_PAD_LEFT) ?></div>
-                <div>
-                    <div class="tech-name-jp"><?= e(tf($tech, 'name')) ?></div>
-                    <div class="tech-name-en"><?= e($tech['name_en']) ?></div>
+            <div class="tech-item reveal" id="technology-<?= (int) $tech['id'] ?>">
+                <button class="tech-row" type="button" data-tech-toggle aria-expanded="false" aria-controls="technology-detail-<?= (int) $tech['id'] ?>">
+                    <span class="tech-index"><?= str_pad($i + 1, 2, '0', STR_PAD_LEFT) ?></span>
+                    <span>
+                        <span class="tech-name-jp"><?= e(tf($tech, 'name')) ?></span>
+                        <span class="tech-name-en"><?= e($tech['name_en']) ?></span>
+                    </span>
+                    <span class="tech-desc"><?= e(truncate(tf($tech, 'description'), 90)) ?></span>
+                    <span class="tech-thumb"><img src="<?= e(image_url($tech['image'], 'technologies')) ?>" alt="" loading="lazy"></span>
+                    <span class="tech-toggle-icon" aria-hidden="true"></span>
+                </button>
+                <div class="tech-detail" id="technology-detail-<?= (int) $tech['id'] ?>" hidden>
+                    <div class="tech-detail-inner">
+                        <p><?= e(tf($tech, 'description')) ?></p>
+                        <a href="<?= e(base_url('contact.php?inquiry_type=general')) ?>" class="text-link">
+                            <?= e(t('hero_cta_contact')) ?> <span class="arrow">&#8594;</span>
+                        </a>
+                    </div>
                 </div>
-                <div class="tech-desc"><?= e(truncate(tf($tech, 'description'), 90)) ?></div>
-                <div class="tech-thumb"><img src="<?= e(image_url($tech['image'], 'technologies')) ?>" alt="" loading="lazy"></div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -310,8 +359,26 @@ include __DIR__ . '/includes/header.php';
     </div>
 </section>
 
+<!-- ============================== LOCATION ============================== -->
+<section class="section section--white location-section" id="location">
+    <div class="container location-grid">
+        <div class="location-copy reveal">
+            <div class="eyebrow"><?= $CURRENT_LANG === 'ja' ? 'アクセス' : 'Location' ?></div>
+            <h2 class="section-title"><?= $CURRENT_LANG === 'ja' ? '私たちの拠点' : 'Visit Our Facility' ?></h2>
+            <p class="section-subtitle"><?= e($locationAddress) ?></p>
+            <a href="<?= e($mapsUrl) ?>" class="btn btn--outline-dark" target="_blank" rel="noopener noreferrer">
+                <?= $CURRENT_LANG === 'ja' ? 'Google マップで見る' : 'Open in Google Maps' ?> <span class="btn-arrow">&#8599;</span>
+            </a>
+        </div>
+        <div class="location-map reveal">
+            <iframe src="<?= e($mapsEmbedUrl) ?>" title="Google Maps preview for <?= e($locationAddress) ?>"
+                    loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
+    </div>
+</section>
+
 <!-- ============================== CONTACT CTA ============================== -->
-<section class="cta-band">
+<section class="cta-band<?= !empty($ctaBlock['image']) ? ' cta-band--image' : '' ?>"<?= !empty($ctaBlock['image']) ? ' style="background-image:url(\'' . e(image_url($ctaBlock['image'], 'homepage')) . '\');"' : '' ?>>
     <div class="container">
         <h2 class="section-title"><?= e(tf($ctaBlock, 'title')) ?></h2>
         <p class="section-subtitle" style="margin:18px auto 0; color:rgba(14,15,17,0.7);"><?= e(tf($ctaBlock, 'subtitle')) ?></p>

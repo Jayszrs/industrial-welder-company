@@ -10,6 +10,7 @@ $fields = [
     'business_activities_ja', 'business_activities_en',
     'address_ja', 'address_en',
     'phone', 'email', 'website',
+    'linkedin_url', 'instagram_url', 'tiktok_url',
 ];
 
 $errors = [];
@@ -27,7 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $values = [];
-foreach ($fields as $f) { $values[$f] = get_setting($f); }
+$fieldDefaults = [
+    'linkedin_url' => 'https://www.linkedin.com/',
+    'instagram_url' => 'https://www.instagram.com/',
+    'tiktok_url' => 'https://www.tiktok.com/',
+];
+foreach ($fields as $f) { $values[$f] = get_setting($f, $fieldDefaults[$f] ?? ''); }
 $flash = get_flash();
 
 $adminTitle  = 'Company Profile';
@@ -118,6 +124,23 @@ include __DIR__ . '/includes/admin-header.php';
             <div class="aform-row">
                 <label class="aform-label">Website</label>
                 <input type="text" name="website" class="aform-control" value="<?= e($values['website']) ?>">
+            </div>
+        </div>
+
+        <div class="aform-section-title">Social Media</div>
+        <p class="aform-help">These links appear on the homepage, mobile menu, and footer. Leave a field empty to hide that icon.</p>
+        <div class="aform-row--split3">
+            <div class="aform-row">
+                <label class="aform-label">LinkedIn URL</label>
+                <input type="url" name="linkedin_url" class="aform-control" value="<?= e($values['linkedin_url']) ?>" placeholder="https://www.linkedin.com/company/...">
+            </div>
+            <div class="aform-row">
+                <label class="aform-label">Instagram URL</label>
+                <input type="url" name="instagram_url" class="aform-control" value="<?= e($values['instagram_url']) ?>" placeholder="https://www.instagram.com/...">
+            </div>
+            <div class="aform-row">
+                <label class="aform-label">TikTok URL</label>
+                <input type="url" name="tiktok_url" class="aform-control" value="<?= e($values['tiktok_url']) ?>" placeholder="https://www.tiktok.com/@...">
             </div>
         </div>
 

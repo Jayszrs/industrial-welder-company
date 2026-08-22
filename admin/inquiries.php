@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/auth.php';
 admin_require_login();
 
 $pdo = getPDO();
+ensure_inquiry_order_fields($pdo);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
     if (csrf_verify()) {
@@ -53,6 +54,12 @@ include __DIR__ . '/includes/admin-header.php';
             <tr><th>Email</th><td><?= e($viewRow['email']) ?></td></tr>
             <tr><th>Phone</th><td><?= e($viewRow['phone']) ?: '—' ?></td></tr>
             <tr><th>Subject</th><td><?= e($viewRow['subject']) ?: '—' ?></td></tr>
+            <?php if (!empty($viewRow['product_interest']) || in_array($viewRow['inquiry_type'], ['product', 'quote', 'order'], true)): ?>
+            <tr><th>Product / Service</th><td><?= e($viewRow['product_interest']) ?: '—' ?></td></tr>
+            <tr><th>Quantity</th><td><?= e($viewRow['quantity']) ?: '—' ?></td></tr>
+            <tr><th>Budget</th><td><?= e($viewRow['budget_range']) ?: '—' ?></td></tr>
+            <tr><th>Timeline</th><td><?= e($viewRow['desired_timeline']) ?: '—' ?></td></tr>
+            <?php endif; ?>
         </table>
         <div class="aform-label">Message</div>
         <div style="white-space:pre-wrap; background:var(--c-off-white); padding:20px; border:1px solid var(--c-light-gray); margin-top:8px; line-height:1.8;"><?= e($viewRow['message']) ?></div>

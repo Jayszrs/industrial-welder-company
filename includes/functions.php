@@ -164,6 +164,94 @@ function handle_image_upload(string $fieldName, string $subfolder): ?string
     return $filename;
 }
 
+/**
+ * Save every image submitted by a multiple file input.
+ * Returns the generated filenames in the same order selected by the user.
+ */
+function handle_multiple_image_uploads(string $fieldName, string $subfolder): array
+{
+    if (empty($_FILES[$fieldName])) {
+        return [];
+    }
+
+    $batch = $_FILES[$fieldName];
+    $names = is_array($batch['name'] ?? null) ? $batch['name'] : [$batch['name'] ?? ''];
+    $types = is_array($batch['type'] ?? null) ? $batch['type'] : [$batch['type'] ?? ''];
+    $tmpNames = is_array($batch['tmp_name'] ?? null) ? $batch['tmp_name'] : [$batch['tmp_name'] ?? ''];
+    $errors = is_array($batch['error'] ?? null) ? $batch['error'] : [$batch['error'] ?? UPLOAD_ERR_NO_FILE];
+    $sizes = is_array($batch['size'] ?? null) ? $batch['size'] : [$batch['size'] ?? 0];
+    $saved = [];
+
+    foreach ($names as $index => $name) {
+        $error = (int) ($errors[$index] ?? UPLOAD_ERR_NO_FILE);
+        if ($error === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+
+        $_FILES['__batch_image'] = [
+            'name' => $name,
+            'type' => $types[$index] ?? '',
+            'tmp_name' => $tmpNames[$index] ?? '',
+            'error' => $error,
+            'size' => $sizes[$index] ?? 0,
+        ];
+
+        try {
+            $filename = handle_image_upload('__batch_image', $subfolder);
+            if ($filename !== null) {
+                $saved[] = $filename;
+            }
+        } catch (Throwable $exception) {
+            foreach ($saved as $savedFilename) {
+                delete_uploaded_image($savedFilename, $subfolder);
+            }
+            unset($_FILES['__batch_image']);
+            throw $exception;
+        }
+    }
+
+    unset($_FILES['__batch_image']);
+    return $saved;
+}
+
+/**
+ * Lightweight migration for installations that already imported database.sql.
+ */
+function ensure_hero_slides_table(PDO $pdo): void
+{
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS hero_slides (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            image VARCHAR(255) NOT NULL,
+            sort_order INT DEFAULT 0,
+            status TINYINT(1) DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_hero_slides_display (status, sort_order, id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    );
+}
+
+/**
+ * Add optional quotation/order fields without requiring existing installations
+ * to re-import the whole database.
+ */
+function ensure_inquiry_order_fields(PDO $pdo): void
+{
+    $columns = [
+        'product_interest' => "VARCHAR(255) NULL AFTER subject",
+        'quantity' => "VARCHAR(50) NULL AFTER product_interest",
+        'budget_range' => "VARCHAR(100) NULL AFTER quantity",
+        'desired_timeline' => "VARCHAR(100) NULL AFTER budget_range",
+    ];
+
+    $existingColumns = array_column($pdo->query("SHOW COLUMNS FROM inquiries")->fetchAll(), 'Field');
+    foreach ($columns as $column => $definition) {
+        if (!in_array($column, $existingColumns, true)) {
+            $pdo->exec("ALTER TABLE inquiries ADD COLUMN {$column} {$definition}");
+        }
+    }
+}
+
 function image_url(?string $filename, string $subfolder): string
 {
     if (empty($filename)) {
@@ -202,6 +290,34 @@ function admin_url(string $path = ''): string
     return rtrim(base_url('admin'), '/') . '/' . ltrim($path, '/');
 }
 
+function asset_url(string $path): string
+{
+    $normalizedPath = ltrim(str_replace('\\', '/', $path), '/');
+    $url = base_url($normalizedPath);
+    $file = BASE_PATH . '/' . $normalizedPath;
+    return is_file($file) ? $url . '?v=' . filemtime($file) : $url;
+}
+
+/**
+ * Use an uploaded content photo as a page banner, with local sample photos
+ * as a fallback while the seeded SVG placeholders have not been replaced.
+ */
+function page_header_image_url(?string $filename = null, string $subfolder = '', int $fallbackIndex = 0): string
+{
+    $extension = strtolower(pathinfo((string) $filename, PATHINFO_EXTENSION));
+    if (!empty($filename) && in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+        return image_url($filename, $subfolder);
+    }
+
+    $fallbacks = [
+        'assets/images/hero-welding-v2.jpg',
+        'assets/images/hero-robotic-v2.jpg',
+        'assets/images/hero-machining-v2.jpg',
+    ];
+    $index = abs($fallbackIndex) % count($fallbacks);
+    return base_url($fallbacks[$index]);
+}
+
 /* ----------------------------------------------------------------------
  * Site settings (key/value)
  * -------------------------------------------------------------------- */
@@ -229,6 +345,50 @@ function set_setting(string $key, string $value): void
          ON DUPLICATE KEY UPDATE setting_value = :v2"
     );
     $stmt->execute([':k' => $key, ':v' => $value, ':v2' => $value]);
+}
+
+/**
+ * Public social destinations. Empty admin values are omitted automatically.
+ */
+function site_social_links(): array
+{
+    $email = get_setting('email', '');
+    $links = [
+        'linkedin' => ['label' => 'LinkedIn', 'href' => get_setting('linkedin_url', 'https://www.linkedin.com/')],
+        'email' => ['label' => 'Email', 'href' => $email !== '' ? 'mailto:' . $email : ''],
+        'instagram' => ['label' => 'Instagram', 'href' => get_setting('instagram_url', 'https://www.instagram.com/')],
+        'tiktok' => ['label' => 'TikTok', 'href' => get_setting('tiktok_url', 'https://www.tiktok.com/')],
+    ];
+
+    return array_filter($links, static function (array $link): bool {
+        return str_starts_with($link['href'], 'mailto:') || preg_match('#^https?://#i', $link['href']) === 1;
+    });
+}
+
+function social_icon_svg(string $network): string
+{
+    $icons = [
+        'linkedin' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8.2H3.2V21h3.3V8.2ZM4.8 3a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8ZM21 13.7c0-3.9-2.1-5.7-4.8-5.7-2.2 0-3.2 1.2-3.8 2.1V8.2H9.1V21h3.3v-6.3c0-1.7.3-3.3 2.4-3.3 2 0 2.1 1.9 2.1 3.4V21H21v-7.3Z"/></svg>',
+        'email' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5h18v13H3v-13Zm1.8 1.7L12 12.4l7.2-5.2H4.8Zm14.4 9.6V9.4L12 14.6 4.8 9.4v7.4h14.4Z"/></svg>',
+        'instagram' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 2.8h9.6a4.4 4.4 0 0 1 4.4 4.4v9.6a4.4 4.4 0 0 1-4.4 4.4H7.2a4.4 4.4 0 0 1-4.4-4.4V7.2a4.4 4.4 0 0 1 4.4-4.4Zm0 1.8a2.6 2.6 0 0 0-2.6 2.6v9.6a2.6 2.6 0 0 0 2.6 2.6h9.6a2.6 2.6 0 0 0 2.6-2.6V7.2a2.6 2.6 0 0 0-2.6-2.6H7.2Zm10.1 1.3a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 7.3a4.7 4.7 0 1 1 0 9.4 4.7 4.7 0 0 1 0-9.4Zm0 1.8a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8Z"/></svg>',
+        'tiktok' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.1 3c.3 2.2 1.5 3.6 3.9 3.8v3a8.2 8.2 0 0 1-3.9-1.1v6.1a6.2 6.2 0 1 1-5.4-6.1v3.1a3.2 3.2 0 1 0 2.4 3V3h3Z"/></svg>',
+    ];
+
+    return $icons[$network] ?? '';
+}
+
+function render_social_links(string $className = 'social-links'): void
+{
+    echo '<div class="' . e($className) . '" aria-label="Social media">';
+    foreach (site_social_links() as $network => $link) {
+        $external = !str_starts_with($link['href'], 'mailto:');
+        echo '<a href="' . e($link['href']) . '" aria-label="' . e($link['label']) . '" title="' . e($link['label']) . '"';
+        if ($external) {
+            echo ' target="_blank" rel="noopener noreferrer"';
+        }
+        echo '>' . social_icon_svg($network) . '<span class="sr-only">' . e($link['label']) . '</span></a>';
+    }
+    echo '</div>';
 }
 
 /* ----------------------------------------------------------------------

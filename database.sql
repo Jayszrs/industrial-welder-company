@@ -52,6 +52,9 @@ INSERT INTO site_settings (setting_key, setting_value) VALUES
 ('phone', '+81-45-000-1234'),
 ('email', 'info@yamato-welding.example.com'),
 ('website', 'https://www.yamato-welding.example.com'),
+('linkedin_url', 'https://www.linkedin.com/'),
+('instagram_url', 'https://www.instagram.com/'),
+('tiktok_url', 'https://www.tiktok.com/'),
 ('sample_data_notice', 'DEMO DATA — replace via the admin panel before going live'),
 
 -- Homepage "our strength" section intro (used together with the stats table)
@@ -107,6 +110,16 @@ INSERT INTO homepage_content (section_key, title_ja, title_en, subtitle_ja, subt
 -- -----------------------------------------------------------------------------
 -- stats — homepage strength numbers (editable, demo values)
 -- -----------------------------------------------------------------------------
+-- Unlimited homepage slideshow images managed from admin.
+CREATE TABLE hero_slides (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image VARCHAR(255) NOT NULL,
+    sort_order INT DEFAULT 0,
+    status TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_hero_slides_display (status, sort_order, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE stats (
     id INT AUTO_INCREMENT PRIMARY KEY,
     number_value VARCHAR(20) NOT NULL,
@@ -412,6 +425,10 @@ CREATE TABLE inquiries (
     email VARCHAR(150) NOT NULL,
     phone VARCHAR(50),
     subject VARCHAR(255),
+    product_interest VARCHAR(255),
+    quantity VARCHAR(50),
+    budget_range VARCHAR(100),
+    desired_timeline VARCHAR(100),
     message TEXT NOT NULL,
     is_read TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -26,11 +26,12 @@ $related = $stmt->fetchAll();
 $pageTitle       = tf($article, 'title');
 $pageDescription = truncate(tf($article, 'content'), 150);
 $activePage      = 'news';
+$pageHeaderImage = page_header_image_url($article['image'] ?? null, 'news', 0);
 
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow"><?= e(tf($article, 'category')) ?></div>
         <h1 class="page-title"><?= e(tf($article, 'title')) ?></h1>

@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/language.php';
 
 $pdo = getPDO();
 $facilities = $pdo->query("SELECT * FROM facilities WHERE status = 1 ORDER BY sort_order ASC")->fetchAll();
+$pageHeaderImage = page_header_image_url($facilities[0]['image'] ?? null, 'facilities', 2);
 
 $pageTitle       = t('facility_title');
 $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, '');
@@ -12,7 +13,7 @@ $activePage      = 'products'; // facility sits under the products/equipment umb
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow"><?= e(t('facility_eyebrow')) ?></div>
         <h1 class="page-title"><?= e(t('facility_title')) ?></h1>

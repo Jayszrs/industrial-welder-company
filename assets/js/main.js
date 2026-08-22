@@ -21,6 +21,89 @@
     window.addEventListener('scroll', updateHeader, { passive: true });
 
     /* --------------------------------------------------------------
+     * Hero slideshow: automatic continuous crossfade every 5 seconds.
+     * ------------------------------------------------------------ */
+    var heroSlider = document.querySelector('[data-hero-slider]');
+    if (heroSlider) {
+        var heroSlides = Array.prototype.slice.call(heroSlider.querySelectorAll('.hero-slide'));
+        var heroIndex = 0;
+        var heroTimer = null;
+        var heroInterval = parseInt(heroSlider.getAttribute('data-interval'), 10) || 5000;
+        var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function ensureHeroSlideLoaded(index) {
+            if (!heroSlides.length) return;
+            var normalizedIndex = (index + heroSlides.length) % heroSlides.length;
+            var slide = heroSlides[normalizedIndex];
+            var background = slide.getAttribute('data-hero-bg');
+            if (background) {
+                slide.style.backgroundImage = 'url("' + background.replace(/"/g, '%22') + '")';
+                slide.removeAttribute('data-hero-bg');
+            }
+        }
+
+        function showHeroSlide(nextIndex) {
+            if (!heroSlides.length) return;
+            heroIndex = (nextIndex + heroSlides.length) % heroSlides.length;
+            ensureHeroSlideLoaded(heroIndex);
+            ensureHeroSlideLoaded(heroIndex + 1);
+            heroSlides.forEach(function (slide, index) {
+                slide.classList.toggle('is-active', index === heroIndex);
+            });
+        }
+
+        function stopHeroAutoplay() {
+            if (heroTimer) window.clearInterval(heroTimer);
+            heroTimer = null;
+        }
+
+        function startHeroAutoplay() {
+            stopHeroAutoplay();
+            if (reduceMotion || heroSlides.length < 2 || document.hidden) return;
+            heroTimer = window.setInterval(function () {
+                showHeroSlide(heroIndex + 1);
+            }, heroInterval);
+        }
+
+        document.addEventListener('visibilitychange', startHeroAutoplay);
+        showHeroSlide(0);
+        startHeroAutoplay();
+    }
+
+    /* --------------------------------------------------------------
+     * Lightweight parallax: one requestAnimationFrame update per scroll frame.
+     * ------------------------------------------------------------ */
+    var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .page-header, .technology-page-hero, .section--content-bg'));
+    var parallaxReduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (parallaxEls.length && !parallaxReduceMotion) {
+        var parallaxTicking = false;
+
+        function updateParallax() {
+            var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            parallaxEls.forEach(function (element) {
+                var rect = element.getBoundingClientRect();
+                if (rect.bottom < -120 || rect.top > viewportHeight + 120) return;
+                var distanceFromCenter = (rect.top + rect.height / 2) - viewportHeight / 2;
+                var maxOffset = element.classList.contains('section--content-bg') ? 28 : 52;
+                var offset = Math.max(-maxOffset, Math.min(maxOffset, distanceFromCenter * -0.11));
+                element.style.setProperty('--parallax-y', offset.toFixed(1) + 'px');
+                element.style.setProperty('--parallax-content-y', (offset * -0.26).toFixed(1) + 'px');
+            });
+            parallaxTicking = false;
+        }
+
+        function requestParallaxUpdate() {
+            if (parallaxTicking) return;
+            parallaxTicking = true;
+            window.requestAnimationFrame(updateParallax);
+        }
+
+        updateParallax();
+        window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+        window.addEventListener('resize', requestParallaxUpdate, { passive: true });
+    }
+
+    /* --------------------------------------------------------------
      * Mobile hamburger menu
      * ------------------------------------------------------------ */
     var hamburger = document.querySelector('.hamburger');
@@ -44,6 +127,38 @@
     }
 
     /* --------------------------------------------------------------
+     * Technology accordion: each row reveals its complete detail
+     * ------------------------------------------------------------ */
+    document.querySelectorAll('[data-tech-accordion]').forEach(function (accordion) {
+        var toggles = Array.prototype.slice.call(accordion.querySelectorAll('[data-tech-toggle]'));
+
+        function setTechItem(toggle, shouldOpen) {
+            var item = toggle.closest('.tech-item');
+            var panelId = toggle.getAttribute('aria-controls');
+            var panel = panelId ? document.getElementById(panelId) : null;
+            if (!item || !panel) return;
+            item.classList.toggle('is-open', shouldOpen);
+            toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+            panel.hidden = !shouldOpen;
+        }
+
+        toggles.forEach(function (toggle) {
+            toggle.addEventListener('click', function () {
+                var shouldOpen = toggle.getAttribute('aria-expanded') !== 'true';
+                toggles.forEach(function (otherToggle) {
+                    setTechItem(otherToggle, otherToggle === toggle && shouldOpen);
+                });
+            });
+        });
+
+        if (/^#technology-\d+$/.test(window.location.hash)) {
+            var linkedItem = accordion.querySelector(window.location.hash);
+            var linkedToggle = linkedItem && linkedItem.querySelector('[data-tech-toggle]');
+            if (linkedToggle) setTechItem(linkedToggle, true);
+        }
+    });
+
+    /* --------------------------------------------------------------
      * Scroll reveal (fade up) via IntersectionObserver
      * ------------------------------------------------------------ */
     var revealEls = document.querySelectorAll('.reveal');
@@ -55,7 +170,7 @@
                     revealObserver.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+        }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
 
         revealEls.forEach(function (el) { revealObserver.observe(el); });
     } else {
@@ -124,6 +239,26 @@
      * ------------------------------------------------------------ */
     var contactForm = document.querySelector('#contact-form');
     if (contactForm) {
+        var inquiryType = contactForm.querySelector('[name="inquiry_type"]');
+        var orderFields = contactForm.querySelector('[data-order-fields]');
+        var orderRequiredFields = orderFields ? orderFields.querySelectorAll('[data-order-required]') : [];
+
+        function syncOrderFields() {
+            if (!inquiryType || !orderFields) return;
+            var showDetails = ['product', 'quote', 'order'].indexOf(inquiryType.value) !== -1;
+            var isOrder = inquiryType.value === 'order';
+            orderFields.hidden = !showDetails;
+            orderFields.classList.toggle('is-visible', showDetails);
+            orderFields.classList.toggle('is-order', isOrder);
+            orderRequiredFields.forEach(function (field) {
+                field.required = isOrder;
+                if (!isOrder) field.classList.remove('is-invalid');
+            });
+        }
+
+        if (inquiryType) inquiryType.addEventListener('change', syncOrderFields);
+        syncOrderFields();
+
         contactForm.addEventListener('submit', function (e) {
             var requiredFields = contactForm.querySelectorAll('[required]');
             var valid = true;

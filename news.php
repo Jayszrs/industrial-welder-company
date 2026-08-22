@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/language.php';
 
 $pdo = getPDO();
 $newsItems = $pdo->query("SELECT * FROM news WHERE status = 1 ORDER BY publish_date DESC")->fetchAll();
+$pageHeaderImage = page_header_image_url($newsItems[0]['image'] ?? null, 'news', 0);
 
 $pageTitle       = t('news_title');
 $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, '');
@@ -12,7 +13,7 @@ $activePage      = 'news';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow"><?= e(t('news_eyebrow')) ?></div>
         <h1 class="page-title"><?= e(t('news_title')) ?></h1>

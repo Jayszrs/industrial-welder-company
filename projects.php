@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/language.php';
 
 $pdo = getPDO();
 $projects = $pdo->query("SELECT * FROM projects WHERE status = 1 ORDER BY created_at DESC")->fetchAll();
+$pageHeaderImage = page_header_image_url($projects[0]['image'] ?? null, 'projects', 1);
 
 $pageTitle       = t('projects_title');
 $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, '');
@@ -12,7 +13,7 @@ $activePage      = 'projects';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow"><?= e(t('projects_eyebrow')) ?></div>
         <h1 class="page-title"><?= e(t('projects_title')) ?></h1>

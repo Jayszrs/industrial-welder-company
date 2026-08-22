@@ -5,13 +5,14 @@ require_once __DIR__ . '/includes/language.php';
 $pageTitle       = t('privacy_page_title');
 $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, '');
 $activePage      = '';
+$pageHeaderImage = page_header_image_url(null, '', 2);
 
 include __DIR__ . '/includes/header.php';
 
 $companyName = get_setting('company_name_' . $CURRENT_LANG);
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow">LEGAL</div>
         <h1 class="page-title"><?= e(t('privacy_page_title')) ?></h1>

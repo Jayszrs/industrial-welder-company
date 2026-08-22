@@ -14,6 +14,7 @@ $footEmail       = get_setting('email', '');
                     <span class="brand-sub">WELDING INDUSTRIES</span>
                 </a>
                 <p class="footer-tagline"><?= e($footTagline) ?></p>
+                <?php render_social_links('footer-social'); ?>
             </div>
 
             <div>
@@ -38,8 +39,8 @@ $footEmail       = get_setting('email', '');
             <div>
                 <div class="footer-heading"><?= e(t('footer_contact')) ?></div>
                 <div class="footer-contact-item"><?= nl2br(e($footAddress)) ?></div>
-                <div class="footer-contact-item">TEL: <?= e($footPhone) ?></div>
-                <div class="footer-contact-item"><?= e($footEmail) ?></div>
+                <div class="footer-contact-item">TEL: <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $footPhone)) ?>"><?= e($footPhone) ?></a></div>
+                <div class="footer-contact-item"><a href="mailto:<?= e($footEmail) ?>"><?= e($footEmail) ?></a></div>
             </div>
         </div>
 
@@ -52,6 +53,6 @@ $footEmail       = get_setting('email', '');
     </div>
 </footer>
 
-<script src="<?= e(base_url('assets/js/main.js')) ?>"></script>
+<script src="<?= e(asset_url('assets/js/main.js')) ?>"></script>
 </body>
 </html>

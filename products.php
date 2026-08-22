@@ -21,6 +21,7 @@ if ($activeCategory) {
     $stmt = $pdo->query("SELECT * FROM products WHERE status = 1 ORDER BY created_at DESC");
 }
 $products = $stmt->fetchAll();
+$pageHeaderImage = page_header_image_url($products[0]['image'] ?? null, 'products', 2);
 
 $pageTitle       = t('products_title');
 $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, '');
@@ -29,7 +30,7 @@ $activePage      = 'products';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header">
+<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
     <div class="container">
         <div class="eyebrow"><?= e(t('products_eyebrow')) ?></div>
         <h1 class="page-title"><?= e(t('products_title')) ?></h1>
