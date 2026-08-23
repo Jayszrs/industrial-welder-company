@@ -21,14 +21,14 @@
     window.addEventListener('scroll', updateHeader, { passive: true });
 
     /* --------------------------------------------------------------
-     * Hero slideshow: automatic continuous crossfade every 5 seconds.
+     * Hero slideshow: automatic continuous crossfade every 3 seconds.
      * ------------------------------------------------------------ */
     var heroSlider = document.querySelector('[data-hero-slider]');
     if (heroSlider) {
         var heroSlides = Array.prototype.slice.call(heroSlider.querySelectorAll('.hero-slide'));
         var heroIndex = 0;
         var heroTimer = null;
-        var heroInterval = parseInt(heroSlider.getAttribute('data-interval'), 10) || 5000;
+        var heroInterval = parseInt(heroSlider.getAttribute('data-interval'), 10) || 3000;
         var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         function ensureHeroSlideLoaded(index) {

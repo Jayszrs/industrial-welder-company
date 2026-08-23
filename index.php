@@ -58,7 +58,7 @@ include __DIR__ . '/includes/header.php';
 ?>
 
 <!-- ============================== HERO ============================== -->
-<section class="hero" data-hero-slider data-interval="5000" aria-label="Company introduction">
+<section class="hero" data-hero-slider data-interval="3000" aria-label="Company introduction">
     <div class="hero-slides" aria-hidden="true">
         <?php foreach ($heroSlides as $i => $slide): ?>
         <div class="hero-media hero-slide<?= $i === 0 ? ' is-active' : '' ?>"
