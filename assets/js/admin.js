@@ -29,7 +29,7 @@
 
         var preview = document.createElement('img');
         preview.className = 'aimage-upload__preview';
-        preview.alt = 'Selected image preview';
+        preview.alt = '';
         preview.hidden = true;
         upload.appendChild(preview);
 
@@ -37,7 +37,11 @@
         input.addEventListener('change', function () {
             var files = input.files ? Array.prototype.slice.call(input.files) : [];
             var file = files[0];
-            if (!file) return;
+            if (!file) {
+                preview.hidden = true;
+                upload.classList.remove('has-preview');
+                return;
+            }
             if (objectUrl) URL.revokeObjectURL(objectUrl);
             objectUrl = URL.createObjectURL(file);
             preview.src = objectUrl;

@@ -163,14 +163,18 @@ include __DIR__ . '/includes/header.php';
         </div>
         <div class="technology-facility-grid">
             <?php foreach ($facilities as $i => $facility): ?>
-            <article class="technology-facility-card reveal">
-                <img src="<?= e($contentImageUrl($facility['image'], 'facilities', $i)) ?>" alt="<?= e(tf($facility, 'machine_name')) ?>" loading="lazy">
-                <div>
+            <a href="<?= e(base_url('facility.php#facility-' . $facility['id'])) ?>" class="technology-facility-card reveal" aria-label="<?= e(tf($facility, 'machine_name')) ?>">
+                <div class="technology-facility-card__media">
+                    <img src="<?= e($contentImageUrl($facility['image'], 'facilities', $i)) ?>" alt="<?= e(tf($facility, 'machine_name')) ?>" loading="lazy">
+                    <span class="technology-facility-card__arrow" aria-hidden="true">&#8594;</span>
+                </div>
+                <div class="technology-facility-card__body">
                     <span><?= e($facility['manufacturer']) ?> / <?= e($facility['model']) ?></span>
                     <h3><?= e(tf($facility, 'machine_name')) ?></h3>
                     <p><?= e(tf($facility, 'description')) ?></p>
+                    <span class="technology-facility-card__link"><?= $CURRENT_LANG === 'ja' ? '設備詳細を見る' : 'View equipment details' ?> <b aria-hidden="true">&#8594;</b></span>
                 </div>
-            </article>
+            </a>
             <?php endforeach; ?>
         </div>
     </div>

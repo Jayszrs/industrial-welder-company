@@ -9,6 +9,9 @@ $hero      = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'he
 $aboutHome = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'about'")->fetch();
 $strength  = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'strength'")->fetch();
 $ctaBlock  = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'cta'")->fetch();
+$ctaBackgroundImage = !empty($ctaBlock['image'])
+    ? image_url($ctaBlock['image'], 'homepage')
+    : base_url('assets/images/hero-welding-v2.jpg');
 
 $services     = $pdo->query("SELECT * FROM services WHERE status = 1 ORDER BY sort_order ASC LIMIT 6")->fetchAll();
 $technologies = $pdo->query("SELECT * FROM technologies WHERE status = 1 ORDER BY sort_order ASC LIMIT 6")->fetchAll();
@@ -88,7 +91,7 @@ include __DIR__ . '/includes/header.php';
 </section>
 
 <!-- ============================== ABOUT ============================== -->
-<section class="section section--white">
+<section class="section section--white home-about-section">
     <div class="container">
         <div class="about-grid">
             <div class="about-visual reveal">
@@ -147,7 +150,7 @@ include __DIR__ . '/includes/header.php';
 </section>
 
 <!-- ============================== WELDING TECHNOLOGY ============================== -->
-<section class="section section--dark<?= !empty($strength['image']) ? ' section--content-bg' : '' ?>"<?= !empty($strength['image']) ? ' style="background-image:url(\'' . e(image_url($strength['image'], 'homepage')) . '\');"' : '' ?>>
+<section id="strength" class="section section--dark<?= !empty($strength['image']) ? ' section--content-bg' : '' ?>"<?= !empty($strength['image']) ? ' style="background-image:url(\'' . e(image_url($strength['image'], 'homepage')) . '\');"' : '' ?>>
     <div class="container">
         <div class="section-head reveal">
             <div class="eyebrow"><?= e(t('tech_eyebrow')) ?></div>
@@ -240,16 +243,17 @@ include __DIR__ . '/includes/header.php';
 
         <div class="grid-cards">
             <?php foreach ($facilities as $f): ?>
-            <div class="card reveal">
+            <a href="<?= e(base_url('facility.php#facility-' . $f['id'])) ?>" class="card reveal home-facility-card" aria-label="<?= e(tf($f, 'machine_name')) ?>">
                 <div class="card-media">
                     <img src="<?= e(image_url($f['image'], 'facilities')) ?>" alt="<?= e(tf($f, 'machine_name')) ?>" loading="lazy">
+                    <span class="card-media-action" aria-hidden="true">&#8594;</span>
                 </div>
                 <div class="card-body">
                     <div class="card-meta"><?= e($f['manufacturer']) ?> — <?= e($f['model']) ?></div>
                     <h3 class="card-title"><?= e(tf($f, 'machine_name')) ?></h3>
                     <p class="card-text"><?= e(truncate(tf($f, 'description'), 80)) ?></p>
                 </div>
-            </div>
+            </a>
             <?php endforeach; ?>
         </div>
     </div>
@@ -263,7 +267,7 @@ include __DIR__ . '/includes/header.php';
             <h2 class="section-title"><?= e(t('industries_title')) ?></h2>
         </div>
     </div>
-    <div class="industry-grid">
+    <div class="industry-grid home-industries-grid">
         <?php foreach ($industries as $ind): ?>
         <div class="industry-item reveal">
             <div class="industry-icon"><?= e($ind['icon_label']) ?></div>
@@ -378,7 +382,7 @@ include __DIR__ . '/includes/header.php';
 </section>
 
 <!-- ============================== CONTACT CTA ============================== -->
-<section class="cta-band<?= !empty($ctaBlock['image']) ? ' cta-band--image' : '' ?>"<?= !empty($ctaBlock['image']) ? ' style="background-image:url(\'' . e(image_url($ctaBlock['image'], 'homepage')) . '\');"' : '' ?>>
+<section id="contact-cta" class="cta-band cta-band--image" style="background-image:url('<?= e($ctaBackgroundImage) ?>');">
     <div class="container">
         <h2 class="section-title"><?= e(tf($ctaBlock, 'title')) ?></h2>
         <p class="section-subtitle" style="margin:18px auto 0; color:rgba(14,15,17,0.7);"><?= e(tf($ctaBlock, 'subtitle')) ?></p>

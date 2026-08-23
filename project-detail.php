@@ -26,34 +26,56 @@ $related = $stmt->fetchAll();
 $pageTitle       = tf($project, 'name');
 $pageDescription = truncate(tf($project, 'description'), 150);
 $activePage      = 'projects';
-$pageHeaderImage = page_header_image_url($project['image'] ?? null, 'projects', 1);
+$projectImage    = image_url($project['image'], 'projects');
+$projectFacts = array_filter([
+    [t('project_detail_industry'), tf($project, 'industry')],
+    [t('project_detail_year'), $project['year']],
+    [t('project_detail_location'), tf($project, 'location')],
+], static fn(array $fact): bool => trim((string) $fact[1]) !== '');
 
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
-    <div class="container">
-        <div class="eyebrow"><?= e(tf($project, 'industry')) ?> · <?= e($project['year']) ?></div>
-        <h1 class="page-title"><?= e(tf($project, 'name')) ?></h1>
-        <div class="breadcrumb">
+<section class="product-detail-hero project-detail-hero" style="--product-hero-bg:url('<?= e($projectImage) ?>');" role="img" aria-label="<?= e(tf($project, 'name')) ?>">
+    <div class="container product-detail-hero__container">
+        <div class="breadcrumb product-detail-hero__breadcrumb">
             <a href="<?= e(base_url('index.php')) ?>"><?= e(t('breadcrumb_home')) ?></a>
             <span class="sep">/</span>
             <a href="<?= e(base_url('projects.php')) ?>"><?= e(t('nav_projects')) ?></a>
             <span class="sep">/</span>
             <span><?= e(tf($project, 'name')) ?></span>
         </div>
+        <div class="product-detail-hero__content">
+            <div class="eyebrow"><?= e(tf($project, 'industry')) ?> · <?= e($project['year']) ?></div>
+            <h1><?= e(tf($project, 'name')) ?></h1>
+            <p class="product-detail-hero__lead"><?= e(truncate(tf($project, 'description'), 170)) ?></p>
+
+            <?php if (!empty($projectFacts)): ?>
+            <dl class="product-detail-hero__facts">
+                <?php foreach ($projectFacts as [$label, $value]): ?>
+                <div><dt><?= e($label) ?></dt><dd><?= e($value) ?></dd></div>
+                <?php endforeach; ?>
+            </dl>
+            <?php endif; ?>
+
+            <div class="product-detail-hero__actions">
+                <a href="<?= e(base_url('contact.php')) ?>" class="btn btn--primary">
+                    <?= e(t('hero_cta_contact')) ?> <span class="btn-arrow">&#8594;</span>
+                </a>
+                <a href="<?= e(base_url('projects.php')) ?>" class="btn btn--outline-light">
+                    <span class="btn-arrow">&#8592;</span> <?= e(t('project_back')) ?>
+                </a>
+            </div>
+        </div>
     </div>
 </section>
 
-<div class="detail-hero-media">
-    <img src="<?= e(image_url($project['image'], 'projects')) ?>" alt="<?= e(tf($project, 'name')) ?>">
-</div>
-
-<section class="section section--white">
+<section class="section section--white product-detail-content project-detail-content">
     <div class="container">
         <div class="detail-grid">
             <div>
                 <div class="detail-block reveal">
+                    <h3><?= $CURRENT_LANG === 'ja' ? 'プロジェクト概要' : 'Project Overview' ?></h3>
                     <p><?= nl2br(e(tf($project, 'description'))) ?></p>
                 </div>
                 <div class="detail-block reveal">
@@ -72,6 +94,7 @@ include __DIR__ . '/includes/header.php';
 
             <div class="detail-sidebar reveal">
                 <h4><?= e(tf($project, 'name')) ?></h4>
+                <p class="detail-sidebar-copy"><?= $CURRENT_LANG === 'ja' ? '同様の自動化・製造課題について、技術担当者にご相談ください。' : 'Discuss a similar automation or manufacturing challenge with our engineering team.' ?></p>
                 <div class="detail-sidebar-row"><span class="k"><?= e(t('project_detail_industry')) ?></span><span class="v"><?= e(tf($project, 'industry')) ?></span></div>
                 <div class="detail-sidebar-row"><span class="k"><?= e(t('project_detail_year')) ?></span><span class="v"><?= e($project['year']) ?></span></div>
                 <div class="detail-sidebar-row"><span class="k"><?= e(t('project_detail_location')) ?></span><span class="v"><?= e(tf($project, 'location')) ?></span></div>

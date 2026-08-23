@@ -252,6 +252,7 @@ textarea.aform-control { min-height: 110px; resize: vertical; }
 .aimage-upload__copy > span:last-child { color: var(--c-gray); font-size: 11px; }
 .aimage-upload__icon { width: 34px; height: 34px; display: grid; place-items: center; margin-bottom: 4px; background: var(--c-black); color: var(--c-yellow); font-size: 23px; font-weight: 300; }
 .aimage-upload__preview { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; }
+.aimage-upload__preview[hidden] { display: none; }
 .aimage-upload.has-preview::after { content: ""; position: absolute; inset: 0; z-index: 1; background: rgba(14,15,17,0.72); }
 .aimage-upload.has-preview .aimage-upload__copy { color: var(--c-white); }
 .aimage-upload.has-preview .aimage-upload__copy > span:last-child { color: rgba(255,255,255,0.72); }

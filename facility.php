@@ -33,16 +33,23 @@ include __DIR__ . '/includes/header.php';
 
         <div class="grid-cards">
             <?php foreach ($facilities as $f): ?>
-            <div class="card reveal">
-                <div class="card-media">
+            <?php $facilityInquiryUrl = base_url('contact.php?inquiry_type=quote&product=' . urlencode(tf($f, 'machine_name'))); ?>
+            <article class="card reveal facility-card" id="facility-<?= e($f['id']) ?>">
+                <a href="<?= e($facilityInquiryUrl) ?>" class="card-media" aria-label="<?= e(tf($f, 'machine_name')) ?>">
                     <img src="<?= e(image_url($f['image'], 'facilities')) ?>" alt="<?= e(tf($f, 'machine_name')) ?>" loading="lazy">
-                </div>
+                    <span class="card-media-action" aria-hidden="true">&#8594;</span>
+                </a>
                 <div class="card-body">
                     <div class="card-meta"><?= e($f['manufacturer']) ?> — <?= e($f['model']) ?></div>
-                    <h3 class="card-title"><?= e(tf($f, 'machine_name')) ?></h3>
+                    <h3 class="card-title"><a href="<?= e($facilityInquiryUrl) ?>"><?= e(tf($f, 'machine_name')) ?></a></h3>
                     <p class="card-text"><?= e(tf($f, 'description')) ?></p>
+                    <div class="card-foot">
+                        <a href="<?= e($facilityInquiryUrl) ?>" class="text-link">
+                            <?= $CURRENT_LANG === 'ja' ? 'この設備について相談' : 'Ask about this equipment' ?> <span class="arrow">&#8594;</span>
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </article>
             <?php endforeach; ?>
         </div>
 

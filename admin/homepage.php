@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     delete_uploaded_image($current['image'], 'homepage');
                 }
                 set_flash('success', ucfirst($sectionKey) . ' section updated.');
-                redirect(admin_url('homepage.php'));
+                redirect(admin_url('homepage.php#section-' . $sectionKey));
             }
             }
         }
@@ -124,7 +124,7 @@ include __DIR__ . '/includes/admin-header.php';
 <?php endif; ?>
 
 <!-- HERO -->
-<div class="admin-panel">
+<div class="admin-panel" id="section-hero">
     <div class="admin-panel-head"><h2>Hero Section</h2></div>
     <form method="post" enctype="multipart/form-data" class="admin-form">
         <?= csrf_field() ?>
@@ -166,7 +166,7 @@ include __DIR__ . '/includes/admin-header.php';
 <div class="admin-panel" id="hero-slideshow">
     <div class="admin-panel-head">
         <h2>Hero Slideshow (<?= count($heroSlides) ?> images)</h2>
-        <span class="aform-hint">Automatically changes every 5 seconds</span>
+        <span class="aform-hint">Automatically changes every 3 seconds</span>
     </div>
     <form method="post" enctype="multipart/form-data" class="admin-form">
         <?= csrf_field() ?>
@@ -221,7 +221,7 @@ include __DIR__ . '/includes/admin-header.php';
 </div>
 
 <!-- ABOUT -->
-<div class="admin-panel">
+<div class="admin-panel" id="section-about">
     <div class="admin-panel-head"><h2>About Section</h2></div>
     <form method="post" enctype="multipart/form-data" class="admin-form">
         <?= csrf_field() ?>
@@ -258,8 +258,8 @@ include __DIR__ . '/includes/admin-header.php';
 </div>
 
 <!-- STRENGTH -->
-<div class="admin-panel">
-    <div class="admin-panel-head"><h2>Strength / Quality Section Title</h2></div>
+<div class="admin-panel" id="section-strength">
+    <div class="admin-panel-head"><h2>Homepage Strength / Quality</h2><a class="aform-hint" href="<?= e(base_url('index.php#strength')) ?>" target="_blank" rel="noopener">Open live section ↗</a></div>
     <form method="post" enctype="multipart/form-data" class="admin-form">
         <?= csrf_field() ?>
         <input type="hidden" name="section_key" value="strength">
@@ -274,21 +274,21 @@ include __DIR__ . '/includes/admin-header.php';
             </div>
         </div>
         <div class="aform-row">
-            <label class="aform-label">Section Image</label>
+            <label class="aform-label">Strength Background Image</label>
             <?php if (!empty($content['strength']['image'])): ?>
             <div class="aform-current-image"><img src="<?= e(image_url($content['strength']['image'], 'homepage')) ?>" alt=""><span class="aform-hint">Current image.</span></div>
             <?php endif; ?>
             <input type="file" name="image" class="aform-control" accept=".jpg,.jpeg,.png,.webp">
-            <div class="aform-hint">JPG, PNG, or WEBP. Max 5MB.</div>
+            <div class="aform-hint">Shown behind the “Our Strength” statistics on the homepage and in the quality section of About Us. Recommended: landscape 1920 × 1080, JPG/PNG/WEBP, max 5MB.</div>
         </div>
         <div class="aform-hint" style="margin-bottom:16px;">Manage the individual numbers under "Strength / Stats" in the sidebar.</div>
-        <div class="aform-actions"><button type="submit" class="abtn abtn--primary">Save Section Title</button></div>
+        <div class="aform-actions"><button type="submit" class="abtn abtn--primary">Save Strength Section</button></div>
     </form>
 </div>
 
 <!-- CTA -->
-<div class="admin-panel">
-    <div class="admin-panel-head"><h2>Contact CTA Band</h2></div>
+<div class="admin-panel" id="section-cta">
+    <div class="admin-panel-head"><h2>Contact CTA Band</h2><a class="aform-hint" href="<?= e(base_url('index.php#contact-cta')) ?>" target="_blank" rel="noopener">Open live section ↗</a></div>
     <form method="post" enctype="multipart/form-data" class="admin-form">
         <?= csrf_field() ?>
         <input type="hidden" name="section_key" value="cta">
@@ -313,12 +313,14 @@ include __DIR__ . '/includes/admin-header.php';
             </div>
         </div>
         <div class="aform-row">
-            <label class="aform-label">Background Image</label>
+            <label class="aform-label">CTA Background Image</label>
             <?php if (!empty($content['cta']['image'])): ?>
             <div class="aform-current-image"><img src="<?= e(image_url($content['cta']['image'], 'homepage')) ?>" alt=""><span class="aform-hint">Current image.</span></div>
+            <?php else: ?>
+            <div class="aform-current-image"><img src="<?= e(base_url('assets/images/hero-welding-v2.jpg')) ?>" alt=""><span class="aform-hint">Sample fallback currently shown. Upload an image below to replace it.</span></div>
             <?php endif; ?>
             <input type="file" name="image" class="aform-control" accept=".jpg,.jpeg,.png,.webp">
-            <div class="aform-hint">JPG, PNG, or WEBP. Max 5MB.</div>
+            <div class="aform-hint">Shown behind the final contact invitation on the homepage and About Us page. Recommended: wide landscape 1920 × 900, JPG/PNG/WEBP, max 5MB.</div>
         </div>
         <div class="aform-actions"><button type="submit" class="abtn abtn--primary">Save CTA</button></div>
     </form>
