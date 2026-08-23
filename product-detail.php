@@ -46,35 +46,62 @@ $features = array_filter(array_map('trim', explode("\n", tf($product, 'features'
 $pageTitle       = tf($product, 'name');
 $pageDescription = truncate(tf($product, 'short_description'), 150);
 $activePage      = 'products';
-$pageHeaderImage = page_header_image_url($product['image'] ?? null, 'products', 2);
+$productImage    = image_url($product['image'], 'products');
+$productInquiryUrl = base_url('contact.php?inquiry_type=product&product=' . urlencode(tf($product, 'name')));
+$heroFacts = array_filter([
+    [t('product_detail_model'), $product['model']],
+    [$CURRENT_LANG === 'ja' ? '定格出力' : 'Rated Output', $product['spec_output']],
+    [$CURRENT_LANG === 'ja' ? '質量' : 'Weight', $product['spec_weight']],
+], static fn(array $fact): bool => trim((string) $fact[1]) !== '');
 
 include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-header" style="--page-header-bg:url('<?= e($pageHeaderImage) ?>');">
-    <div class="container">
-        <div class="eyebrow"><?= e($category ? tf($category, 'name') : t('products_eyebrow')) ?></div>
-        <h1 class="page-title"><?= e(tf($product, 'name')) ?></h1>
-        <div class="breadcrumb">
+<section class="product-detail-hero" style="--product-hero-bg:url('<?= e($productImage) ?>');" role="img" aria-label="<?= e(tf($product, 'name')) ?>">
+    <div class="container product-detail-hero__container">
+        <div class="breadcrumb product-detail-hero__breadcrumb">
             <a href="<?= e(base_url('index.php')) ?>"><?= e(t('breadcrumb_home')) ?></a>
             <span class="sep">/</span>
             <a href="<?= e(base_url('products.php')) ?>"><?= e(t('nav_products')) ?></a>
             <span class="sep">/</span>
             <span><?= e(tf($product, 'name')) ?></span>
         </div>
+        <div class="product-detail-hero__content">
+            <div class="eyebrow"><?= e($category ? tf($category, 'name') : t('products_eyebrow')) ?></div>
+            <h1><?= e(tf($product, 'name')) ?></h1>
+            <?php if (!empty(tf($product, 'short_description'))): ?>
+            <p class="product-detail-hero__lead"><?= e(tf($product, 'short_description')) ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($heroFacts)): ?>
+            <dl class="product-detail-hero__facts">
+                <?php foreach ($heroFacts as [$label, $value]): ?>
+                <div>
+                    <dt><?= e($label) ?></dt>
+                    <dd><?= e($value) ?></dd>
+                </div>
+                <?php endforeach; ?>
+            </dl>
+            <?php endif; ?>
+
+            <div class="product-detail-hero__actions">
+                <a href="<?= e($productInquiryUrl) ?>" class="btn btn--primary">
+                    <?= e(t('product_detail_contact_cta')) ?> <span class="btn-arrow">&#8594;</span>
+                </a>
+                <a href="<?= e(base_url('products.php')) ?>" class="btn btn--outline-light">
+                    <span class="btn-arrow">&#8592;</span> <?= e(t('products_back')) ?>
+                </a>
+            </div>
+        </div>
     </div>
 </section>
 
-<div class="detail-hero-media">
-    <img src="<?= e(image_url($product['image'], 'products')) ?>" alt="<?= e(tf($product, 'name')) ?>">
-</div>
-
-<section class="section section--white">
+<section class="section section--white product-detail-content">
     <div class="container">
         <div class="detail-grid">
             <div>
                 <div class="detail-block reveal">
-                    <h3><?= e(t('product_detail_specification')) ?></h3>
+                    <h3><?= $CURRENT_LANG === 'ja' ? '製品概要' : 'Product Overview' ?></h3>
                     <p><?= nl2br(e(tf($product, 'description'))) ?></p>
                 </div>
 
@@ -108,10 +135,11 @@ include __DIR__ . '/includes/header.php';
 
             <div class="detail-sidebar reveal">
                 <h4><?= e(tf($product, 'name')) ?></h4>
+                <p class="detail-sidebar-copy"><?= $CURRENT_LANG === 'ja' ? '仕様確認、導入相談、お見積もりについて技術担当者がご案内します。' : 'Talk with our engineering team about specifications, implementation, or a tailored quotation.' ?></p>
                 <div class="detail-sidebar-row"><span class="k"><?= e(t('product_detail_category')) ?></span><span class="v"><?= e($category ? tf($category, 'name') : '—') ?></span></div>
                 <div class="detail-sidebar-row"><span class="k"><?= e(t('product_detail_model')) ?></span><span class="v"><?= e($product['model']) ?></span></div>
                 <div class="detail-sidebar-row"><span class="k"><?= e(t('product_detail_manufacturer')) ?></span><span class="v"><?= e($product['manufacturer']) ?></span></div>
-                <a href="<?= e(base_url('contact.php?inquiry_type=product&product=' . urlencode(tf($product, 'name')))) ?>" class="btn btn--primary btn--block">
+                <a href="<?= e($productInquiryUrl) ?>" class="btn btn--primary btn--block">
                     <?= e(t('product_detail_contact_cta')) ?>
                 </a>
             </div>

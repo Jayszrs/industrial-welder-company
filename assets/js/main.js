@@ -73,7 +73,7 @@
     /* --------------------------------------------------------------
      * Lightweight parallax: one requestAnimationFrame update per scroll frame.
      * ------------------------------------------------------------ */
-    var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .page-header, .technology-page-hero, .section--content-bg'));
+    var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .page-header, .technology-page-hero, .product-detail-hero, .section--content-bg'));
     var parallaxReduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (parallaxEls.length && !parallaxReduceMotion) {
         var parallaxTicking = false;
