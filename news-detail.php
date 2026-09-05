@@ -2,6 +2,10 @@
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/language.php';
 
+// News is currently disabled in the public website; keep its data intact.
+header('Location: ' . base_url('index.php'), true, 302);
+exit;
+
 $pdo = getPDO();
 $slug = clean($_GET['slug'] ?? '');
 

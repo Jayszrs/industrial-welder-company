@@ -68,7 +68,7 @@ body.admin-body {
     text-transform: uppercase;
     font-size: 13px;
 }
-.admin-login-box button:hover { background: #ffd633; }
+.admin-login-box button:hover { background: #D4D7DA; }
 .admin-login-hint {
     margin-top: 24px;
     padding-top: 20px;
@@ -185,7 +185,7 @@ body.admin-body {
 .abtn--primary { background: var(--c-black); color: var(--c-white); }
 .abtn--primary:hover { background: var(--c-graphite); }
 .abtn--accent { background: var(--c-yellow); color: var(--c-black); }
-.abtn--accent:hover { background: #ffd633; }
+.abtn--accent:hover { background: #D4D7DA; }
 .abtn--outline { border-color: var(--c-light-gray); color: var(--c-graphite); }
 .abtn--outline:hover { border-color: var(--c-black); }
 .abtn--danger { border-color: #D64545; color: #D64545; }
@@ -236,7 +236,7 @@ textarea.aform-control { min-height: 110px; resize: vertical; }
     transition: border-color 0.25s ease, background 0.25s ease;
 }
 .aimage-upload:hover,
-.aimage-upload.is-dragging { border-color: var(--c-yellow); background: #FFFBE8; }
+.aimage-upload.is-dragging { border-color: var(--c-yellow); background: #F2F3F4; }
 .aimage-upload__input {
     position: absolute;
     inset: 0;

@@ -19,8 +19,8 @@ $products     = $pdo->query("SELECT * FROM products WHERE status = 1 ORDER BY cr
 $facilities   = $pdo->query("SELECT * FROM facilities WHERE status = 1 ORDER BY sort_order ASC LIMIT 4")->fetchAll();
 $industries   = $pdo->query("SELECT * FROM industries ORDER BY sort_order ASC")->fetchAll();
 $stats        = $pdo->query("SELECT * FROM stats ORDER BY sort_order ASC")->fetchAll();
+$stats        = array_values(array_filter($stats, static fn(array $stat): bool => (int) ($stat['id'] ?? 0) !== 2 && stripos((string) ($stat['label_en'] ?? ''), 'client') === false));
 $projects     = $pdo->query("SELECT * FROM projects WHERE status = 1 ORDER BY created_at DESC LIMIT 3")->fetchAll();
-$newsItems    = $pdo->query("SELECT * FROM news WHERE status = 1 ORDER BY publish_date DESC LIMIT 3")->fetchAll();
 
 $pageTitle       = tf(['title_ja' => get_setting('company_tagline_ja'), 'title_en' => get_setting('company_tagline_en')], 'title');
 $pageDescription = get_setting('meta_description_' . $CURRENT_LANG, get_setting('meta_description_ja'));
@@ -55,7 +55,6 @@ if (empty($heroSlides)) {
 $locationAddress = get_setting('address_' . $CURRENT_LANG, get_setting('address_en'));
 $mapsQuery       = rawurlencode(str_replace(["\r", "\n"], ' ', $locationAddress));
 $mapsUrl         = 'https://www.google.com/maps/search/?api=1&query=' . $mapsQuery;
-$mapsEmbedUrl    = 'https://www.google.com/maps?q=' . $mapsQuery . '&output=embed';
 
 include __DIR__ . '/includes/header.php';
 ?>
@@ -333,36 +332,6 @@ include __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<!-- ============================== NEWS ============================== -->
-<section class="section section--off">
-    <div class="container">
-        <div class="section-head section-head--split reveal">
-            <div>
-                <div class="eyebrow"><?= e(t('news_eyebrow')) ?></div>
-                <h2 class="section-title"><?= e(t('news_title')) ?></h2>
-            </div>
-            <a href="<?= e(base_url('news.php')) ?>" class="text-link">
-                <?= e(t('news_view_all')) ?> <span class="arrow">&#8594;</span>
-            </a>
-        </div>
-
-        <?php if (empty($newsItems)): ?>
-            <p style="color:var(--c-gray);"><?= e(t('news_no_news')) ?></p>
-        <?php else: ?>
-        <div class="reveal">
-            <?php foreach ($newsItems as $n): ?>
-            <a href="<?= e(base_url('news-detail.php?slug=' . urlencode($n['slug']))) ?>" class="news-row">
-                <div class="news-date"><?= e(format_date($n['publish_date'], $CURRENT_LANG)) ?></div>
-                <div class="news-cat"><?= e(tf($n, 'category')) ?></div>
-                <div class="news-title"><?= e(tf($n, 'title')) ?></div>
-                <div class="news-arrow">&#8594;</div>
-            </a>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-    </div>
-</section>
-
 <!-- ============================== LOCATION ============================== -->
 <section class="section section--white location-section" id="location">
     <div class="container location-grid">
@@ -374,10 +343,36 @@ include __DIR__ . '/includes/header.php';
                 <?= $CURRENT_LANG === 'ja' ? 'Google マップで見る' : 'Open in Google Maps' ?> <span class="btn-arrow">&#8599;</span>
             </a>
         </div>
-        <div class="location-map reveal">
-            <iframe src="<?= e($mapsEmbedUrl) ?>" title="Google Maps preview for <?= e($locationAddress) ?>"
-                    loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-        </div>
+        <a class="location-map location-map--static reveal" href="<?= e($mapsUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Open office location in Google Maps">
+            <span class="static-map-art" aria-hidden="true">
+                <span class="static-map-topline">
+                    <span>Yokohama / Kanagawa</span>
+                    <span>35.4437&deg; N&nbsp;&nbsp;139.6380&deg; E</span>
+                </span>
+                <span class="static-map-road static-map-road--one"></span>
+                <span class="static-map-road static-map-road--two"></span>
+                <span class="static-map-road static-map-road--three"></span>
+                <span class="static-map-road static-map-road--four"></span>
+                <span class="static-map-road static-map-road--five"></span>
+                <span class="static-map-block static-map-block--one"></span>
+                <span class="static-map-block static-map-block--two"></span>
+                <span class="static-map-block static-map-block--three"></span>
+                <span class="static-map-block static-map-block--four"></span>
+                <span class="static-map-block static-map-block--five"></span>
+                <span class="static-map-route"></span>
+                <span class="static-map-area static-map-area--one">Tsurumi</span>
+                <span class="static-map-area static-map-area--two">Kogyo-cho</span>
+                <span class="static-map-compass"><b>N</b><i></i></span>
+                <span class="static-map-pin"><span>HQ</span></span>
+                <span class="static-map-pin-label"><b>Head Office</b><small>Yamato Welding Industries</small></span>
+            </span>
+            <span class="static-map-caption">
+                <span class="static-map-kicker"><i></i> Office location</span>
+                <strong>Yamato Welding Industries</strong>
+                <small><?= e($locationAddress) ?></small>
+                <span class="static-map-action"><span>View route</span><b>&#8599;</b></span>
+            </span>
+        </a>
     </div>
 </section>
 

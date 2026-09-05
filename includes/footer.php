@@ -31,7 +31,6 @@ $footEmail       = get_setting('email', '');
                 <div class="footer-heading"><?= e(t('footer_company')) ?></div>
                 <ul class="footer-links">
                     <li><a href="<?= e(base_url('about.php')) ?>"><?= e(t('nav_about')) ?></a></li>
-                    <li><a href="<?= e(base_url('news.php')) ?>"><?= e(t('nav_news')) ?></a></li>
                     <li><a href="<?= e(base_url('contact.php')) ?>"><?= e(t('nav_contact')) ?></a></li>
                 </ul>
             </div>

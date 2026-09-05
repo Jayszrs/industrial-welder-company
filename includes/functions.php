@@ -348,16 +348,14 @@ function set_setting(string $key, string $value): void
 }
 
 /**
- * Public social destinations. Empty admin values are omitted automatically.
+ * Public contact destination. Previous social profile values stay preserved
+ * in the database, while the current public design exposes email only.
  */
 function site_social_links(): array
 {
     $email = get_setting('email', '');
     $links = [
-        'linkedin' => ['label' => 'LinkedIn', 'href' => get_setting('linkedin_url', 'https://www.linkedin.com/')],
         'email' => ['label' => 'Email', 'href' => $email !== '' ? 'mailto:' . $email : ''],
-        'instagram' => ['label' => 'Instagram', 'href' => get_setting('instagram_url', 'https://www.instagram.com/')],
-        'tiktok' => ['label' => 'TikTok', 'href' => get_setting('tiktok_url', 'https://www.tiktok.com/')],
     ];
 
     return array_filter($links, static function (array $link): bool {
@@ -368,10 +366,7 @@ function site_social_links(): array
 function social_icon_svg(string $network): string
 {
     $icons = [
-        'linkedin' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8.2H3.2V21h3.3V8.2ZM4.8 3a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8ZM21 13.7c0-3.9-2.1-5.7-4.8-5.7-2.2 0-3.2 1.2-3.8 2.1V8.2H9.1V21h3.3v-6.3c0-1.7.3-3.3 2.4-3.3 2 0 2.1 1.9 2.1 3.4V21H21v-7.3Z"/></svg>',
         'email' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5h18v13H3v-13Zm1.8 1.7L12 12.4l7.2-5.2H4.8Zm14.4 9.6V9.4L12 14.6 4.8 9.4v7.4h14.4Z"/></svg>',
-        'instagram' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 2.8h9.6a4.4 4.4 0 0 1 4.4 4.4v9.6a4.4 4.4 0 0 1-4.4 4.4H7.2a4.4 4.4 0 0 1-4.4-4.4V7.2a4.4 4.4 0 0 1 4.4-4.4Zm0 1.8a2.6 2.6 0 0 0-2.6 2.6v9.6a2.6 2.6 0 0 0 2.6 2.6h9.6a2.6 2.6 0 0 0 2.6-2.6V7.2a2.6 2.6 0 0 0-2.6-2.6H7.2Zm10.1 1.3a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 7.3a4.7 4.7 0 1 1 0 9.4 4.7 4.7 0 0 1 0-9.4Zm0 1.8a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8Z"/></svg>',
-        'tiktok' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.1 3c.3 2.2 1.5 3.6 3.9 3.8v3a8.2 8.2 0 0 1-3.9-1.1v6.1a6.2 6.2 0 1 1-5.4-6.1v3.1a3.2 3.2 0 1 0 2.4 3V3h3Z"/></svg>',
     ];
 
     return $icons[$network] ?? '';
@@ -379,7 +374,7 @@ function social_icon_svg(string $network): string
 
 function render_social_links(string $className = 'social-links'): void
 {
-    echo '<div class="' . e($className) . '" aria-label="Social media">';
+    echo '<div class="' . e($className) . '" aria-label="Email contact">';
     foreach (site_social_links() as $network => $link) {
         $external = !str_starts_with($link['href'], 'mailto:');
         echo '<a href="' . e($link['href']) . '" aria-label="' . e($link['label']) . '" title="' . e($link['label']) . '"';

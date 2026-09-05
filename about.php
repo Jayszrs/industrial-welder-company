@@ -7,6 +7,7 @@ $aboutHome = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'ab
 $strengthBlock = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'strength'")->fetch();
 $ctaBlock = $pdo->query("SELECT * FROM homepage_content WHERE section_key = 'cta'")->fetch();
 $stats     = $pdo->query("SELECT * FROM stats ORDER BY sort_order ASC")->fetchAll();
+$stats     = array_values(array_filter($stats, static fn(array $stat): bool => (int) ($stat['id'] ?? 0) !== 2 && stripos((string) ($stat['label_en'] ?? ''), 'client') === false));
 $industries = $pdo->query("SELECT * FROM industries ORDER BY sort_order ASC")->fetchAll();
 $pageHeaderImage = page_header_image_url($aboutHome['image'] ?? null, 'homepage', 0);
 $qualityImage = !empty($strengthBlock['image'])

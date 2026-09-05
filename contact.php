@@ -87,7 +87,6 @@ $activePage      = 'contact';
 $locationAddress = get_setting('address_' . $CURRENT_LANG, get_setting('address_en'));
 $mapsQuery       = rawurlencode(str_replace(["\r", "\n"], ' ', $locationAddress));
 $mapsUrl         = 'https://www.google.com/maps/search/?api=1&query=' . $mapsQuery;
-$mapsEmbedUrl    = 'https://www.google.com/maps?q=' . $mapsQuery . '&output=embed';
 
 include __DIR__ . '/includes/header.php';
 ?>
@@ -258,10 +257,36 @@ include __DIR__ . '/includes/header.php';
                 <?= $CURRENT_LANG === 'ja' ? 'Google マップで見る' : 'Open in Google Maps' ?> <span class="btn-arrow">&#8599;</span>
             </a>
         </div>
-        <div class="location-map reveal">
-            <iframe src="<?= e($mapsEmbedUrl) ?>" title="Google Maps preview for <?= e($locationAddress) ?>"
-                    loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-        </div>
+        <a class="location-map location-map--static reveal" href="<?= e($mapsUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Open office location in Google Maps">
+            <span class="static-map-art" aria-hidden="true">
+                <span class="static-map-topline">
+                    <span>Yokohama / Kanagawa</span>
+                    <span>35.4437&deg; N&nbsp;&nbsp;139.6380&deg; E</span>
+                </span>
+                <span class="static-map-road static-map-road--one"></span>
+                <span class="static-map-road static-map-road--two"></span>
+                <span class="static-map-road static-map-road--three"></span>
+                <span class="static-map-road static-map-road--four"></span>
+                <span class="static-map-road static-map-road--five"></span>
+                <span class="static-map-block static-map-block--one"></span>
+                <span class="static-map-block static-map-block--two"></span>
+                <span class="static-map-block static-map-block--three"></span>
+                <span class="static-map-block static-map-block--four"></span>
+                <span class="static-map-block static-map-block--five"></span>
+                <span class="static-map-route"></span>
+                <span class="static-map-area static-map-area--one">Tsurumi</span>
+                <span class="static-map-area static-map-area--two">Kogyo-cho</span>
+                <span class="static-map-compass"><b>N</b><i></i></span>
+                <span class="static-map-pin"><span>HQ</span></span>
+                <span class="static-map-pin-label"><b>Head Office</b><small>Yamato Welding Industries</small></span>
+            </span>
+            <span class="static-map-caption">
+                <span class="static-map-kicker"><i></i> Office location</span>
+                <strong>Yamato Welding Industries</strong>
+                <small><?= e($locationAddress) ?></small>
+                <span class="static-map-action"><span>View route</span><b>&#8599;</b></span>
+            </span>
+        </a>
     </div>
 </section>
 

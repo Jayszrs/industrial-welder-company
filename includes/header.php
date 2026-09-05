@@ -27,7 +27,7 @@ $companyNameFull  = get_setting('company_name_' . $CURRENT_LANG, t('site_name'))
 <meta property="og:title" content="<?= e($pageTitle) ?> | <?= e($companyNameFull) ?>">
 <meta property="og:description" content="<?= e($pageDescription) ?>">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230E0F11%22/><rect x=%2230%22 y=%2230%22 width=%2240%22 height=%2240%22 fill=%22%23F5C400%22/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230E0F11%22/><rect x=%2230%22 y=%2230%22 width=%2240%22 height=%2240%22 fill=%22%23B8BDC3%22/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -49,7 +49,6 @@ $companyNameFull  = get_setting('company_name_' . $CURRENT_LANG, t('site_name'))
                 <li><a href="<?= e(base_url('technology.php')) ?>" class="<?= $activePage === 'technology' ? 'is-active' : '' ?>"><?= e(t('nav_technology')) ?></a></li>
                 <li><a href="<?= e(base_url('products.php')) ?>" class="<?= $activePage === 'products' ? 'is-active' : '' ?>"><?= e(t('nav_products')) ?></a></li>
                 <li><a href="<?= e(base_url('projects.php')) ?>" class="<?= $activePage === 'projects' ? 'is-active' : '' ?>"><?= e(t('nav_projects')) ?></a></li>
-                <li><a href="<?= e(base_url('news.php')) ?>" class="<?= $activePage === 'news' ? 'is-active' : '' ?>"><?= e(t('nav_news')) ?></a></li>
             </ul>
 
             <div class="lang-switch">
@@ -76,14 +75,13 @@ $companyNameFull  = get_setting('company_name_' . $CURRENT_LANG, t('site_name'))
         <li><a href="<?= e(base_url('technology.php')) ?>"><?= e(t('nav_technology')) ?></a></li>
         <li><a href="<?= e(base_url('products.php')) ?>"><?= e(t('nav_products')) ?></a></li>
         <li><a href="<?= e(base_url('projects.php')) ?>"><?= e(t('nav_projects')) ?></a></li>
-        <li><a href="<?= e(base_url('news.php')) ?>"><?= e(t('nav_news')) ?></a></li>
         <li><a href="<?= e(base_url('contact.php')) ?>" class="mobile-contact-link"><?= e(t('nav_contact')) ?> <span aria-hidden="true">&#8594;</span></a></li>
     </ul>
     <div class="mobile-nav-footer">
         <div class="lang-switch">
-            <a href="<?= e(langSwitchUrl('ja')) ?>" class="<?= $CURRENT_LANG === 'ja' ? 'is-active' : '' ?>" style="color:<?= $CURRENT_LANG === 'ja' ? '#F5C400' : '#fff' ?>"><?= e(t('lang_jp')) ?></a>
+            <a href="<?= e(langSwitchUrl('ja')) ?>" class="<?= $CURRENT_LANG === 'ja' ? 'is-active' : '' ?>"><?= e(t('lang_jp')) ?></a>
             <span class="lang-divider">|</span>
-            <a href="<?= e(langSwitchUrl('en')) ?>" class="<?= $CURRENT_LANG === 'en' ? 'is-active' : '' ?>" style="color:<?= $CURRENT_LANG === 'en' ? '#F5C400' : '#fff' ?>"><?= e(t('lang_en')) ?></a>
+            <a href="<?= e(langSwitchUrl('en')) ?>" class="<?= $CURRENT_LANG === 'en' ? 'is-active' : '' ?>"><?= e(t('lang_en')) ?></a>
         </div>
     </div>
 </div>

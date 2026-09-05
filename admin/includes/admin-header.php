@@ -37,7 +37,6 @@ $adminActive = $adminActive ?? '';
             <a href="<?= e(admin_url('products.php')) ?>" class="<?= $adminActive === 'products' ? 'is-active' : '' ?>">Products</a>
             <a href="<?= e(admin_url('facilities.php')) ?>" class="<?= $adminActive === 'facilities' ? 'is-active' : '' ?>">Facilities</a>
             <a href="<?= e(admin_url('projects.php')) ?>" class="<?= $adminActive === 'projects' ? 'is-active' : '' ?>">Projects</a>
-            <a href="<?= e(admin_url('news.php')) ?>" class="<?= $adminActive === 'news' ? 'is-active' : '' ?>">News</a>
             <a href="<?= e(admin_url('industries.php')) ?>" class="<?= $adminActive === 'industries' ? 'is-active' : '' ?>">Industries</a>
             <a href="<?= e(admin_url('stats.php')) ?>" class="<?= $adminActive === 'stats' ? 'is-active' : '' ?>">Strength / Stats</a>
 
